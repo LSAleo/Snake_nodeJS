@@ -39,7 +39,7 @@ window.onload = function() {
 
     }
 
-    function temps(){
+    function tempsDePartie(){
 
     }
 
@@ -47,12 +47,19 @@ window.onload = function() {
 
     }
 
-    function pomme(){
-
+    function affichagePomme(position){
+        this.position = position
+        this.draw = function(){
+            ctx.beginPath()
+            ctx.fillstyle = "red"
+            let radius = radius/2
+            let x = this.position[0]*blockSize + radius
+            let y = this.position[1]*blockSize + radius
+        }
     }
 
-    function bob(){
-        
+    function affichageBob(){
+
     }
 
     function rafraichirCanva(){
