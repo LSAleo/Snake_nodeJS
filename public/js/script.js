@@ -50,11 +50,21 @@ window.onload = function() {
     function affichagePomme(position){
         this.position = position
         this.draw = function(){
-            ctx.beginPath()
+            ctx.save()
             ctx.fillstyle = "red"
+            ctx.beginPath()
             let radius = radius/2
             let x = this.position[0]*blockSize + radius
             let y = this.position[1]*blockSize + radius
+            ctx.arc(x,y, radius, 0, Math.PI*2, true)
+            ctx.fill()
+            ctx.restore()
+        }
+
+        this.setNewPosition = function(){
+            let newX = Math.round(Math.random() * (widthBlocks -1))
+            let newY = Math.round(Math.random() * (heightBlocks -1))
+            this.position = [newX, newY]
         }
     }
 
@@ -64,5 +74,35 @@ window.onload = function() {
 
     function rafraichirCanva(){
 
+    }
+
+    document.onkeydown = function handleKeyDown(e){
+        let key = e.code
+        let newDirection
+        switch (key) {
+            case ArrowLeft:
+                newDirection = "left"
+            break;
+
+            case ArrowUp:
+                newDirection = "up"
+            break;
+
+            case ArrowRight:
+                newDirection = "right"
+            break;
+
+            case ArrowDown:
+                newDirection = "down"
+            break;
+
+            case Space:
+                restart()
+                return
+        
+            default:
+                return;
+        }
+        blob.setDirection(newDirection)
     }
 }
