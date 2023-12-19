@@ -1,15 +1,16 @@
 window.onload = function() {
-    let serpent
+    let bob
     let canvasWidth = 900
     let canvasHeight = 600
     let blockSize = 30
-    let pomme
+    // let apple
     let score
-    let temps
-    let centre
+    let timer
+    let center
     let ctx
     // let tempsParDefaut
-    let defaite
+    let defeat
+    let delay = 1000
 
     init();
 
@@ -23,23 +24,30 @@ window.onload = function() {
         canvas.style.display = "block"
         document.body.appendChild(canvas)
         ctx = canvas.getContext('2d')
+        bob = new Snake ([[6,4],[5,4],[4,4]])
         score = 0
-        rafraichirCanva()
+        refreshCanvas()
     }
 
-    function perdu(){
-
-    }
-
-    function affichageScore(){
+    function gameOver(){
 
     }
 
-    function affichageBlock(){
+    function restart() {
+    
+    }
+
+    function drawScore(){
 
     }
 
-    function tempsDePartie(){
+    function drawBlock(){
+        let x = position[0] * blockSize
+        let y = position[1] * blockSize
+        ctx.fillRect(x, y, blockSize, blockSize)
+    }
+
+    function timeGame(){
 
     }
 
@@ -47,7 +55,7 @@ window.onload = function() {
 
     }
 
-    function affichagePomme(position){
+    function apple(position){
         this.position = position
         this.draw = function(){
             ctx.save()
@@ -68,12 +76,31 @@ window.onload = function() {
         }
     }
 
-    function affichageBob(){
-
+    function Snake(body, direction){
+        this.body = body
+        // this.direction = direction
+        this.draw = function(){
+           ctx.save()
+           ctx.fillstyle = "green"
+           for(let i=0; i < this.body.length; i++){
+            drawBlock(ctx, this.body[i])
+           }
+           ctx.restore()
+        }
+        this.advance = function(){
+            let nextPosition = this.body[0].slice()
+            nextPosition[0]++
+            this.body.unshift(nextPosition)
+            this.body.pop()
+        }
     }
 
-    function rafraichirCanva(){
-
+    function refreshCanvas(){
+        ctx.clearRect(0,0,canvasWidth,canvasHeight)
+        ctx.fillStyle = "red"
+        bob.advance()
+        bob.draw()
+        setTimeout(refreshCanvas, delay)
     }
 
     document.onkeydown = function handleKeyDown(e){
