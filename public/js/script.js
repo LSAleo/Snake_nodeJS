@@ -9,8 +9,8 @@ window.onload = function() {
     let center
     let ctx
     // let tempsParDefaut
-    let defeat
-    let delay = 1000
+    let defeat = false
+    let delay = 250
     let widthBlocks = canvasWidth/blockSize
     let heightBlocks = canvasHeight/blockSize
 
@@ -33,15 +33,36 @@ window.onload = function() {
     }
 
     function gameOver(){
-
+        defeat = true
+        clearTimeout(refreshCanvas, delay)
     }
 
     function restart() {
     
     }
 
-    function drawScore(){
+    function drawText(){
+        ctx.save()
+        ctx.font = "bold 200px sans-serif"
+        ctx.fillStyle = "gray"
+        ctx.textAlign = "center"
+        ctx.textBaseline = "middle"
+        let centerX = canvasWidth / 2
+        let centerY = canvasHeight / 2
+        ctx.fillText(score.toString(), centerX, centerY)
+        ctx.restore()
+    }
 
+    function drawScore(){
+        ctx.save()
+        ctx.font = "bold 200px sans-serif"
+        ctx.fillStyle = "gray"
+        ctx.textAlign = "center"
+        ctx.textBaseline = "middle"
+        let centerX = canvasWidth / 2
+        let centerY = canvasHeight / 2
+        ctx.fillText(score.toString(), centerX, centerY)
+        ctx.restore()
     }
 
     function drawBlock(ctx, position){
@@ -147,6 +168,7 @@ window.onload = function() {
         this.checkCollision = function(){
             let collision = false
             let head = this.body[0]
+            let rest = this.body.slice(1)
             let snakeX = head[0]
             let snakeY = head[1]
             let minX = 0
@@ -154,10 +176,18 @@ window.onload = function() {
             let maxX = widthBlocks - 1
             let maxY = heightBlocks - 1
             if (snakeX < minX || snakeY < minY || snakeX > maxX || snakeY > maxY){
-                gameOver()
+                defeat = true
+                textGameOver = "Bob s'est manger un mur ! "
             }
+            for (let i = 0; i < rest.length; i++){
+                if(snakeX === rest[i][0] && snakeY === rest[i][1]){
+                    textGameOver = "Bob s'est manger lui même ! "
+                    defeat = true
+                }
+            }
+            return defeat
         }
-        this.isEaingApple = function(appleToEat){
+        this.isEatingApple = function(appleToEat){
             let head = this.body[0]
             if (head[0] === appleToEat.position[0] && head[1] === appleToEat.position[1]){
                 return true
@@ -177,11 +207,12 @@ window.onload = function() {
         }
         ctx.clearRect(0,0,canvasWidth,canvasHeight)
         ctx.fillStyle = "red"
+        bob.checkCollision()
         bob.advance()
         bob.draw()
         apple.draw()
-        bob.checkCollision()
-        if(bob.checkCollision()){
+        drawScore()
+        if(bob.checkCollision() == true){
             clearTimeout()
         }else{
             setTimeout(refreshCanvas, delay)
