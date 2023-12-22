@@ -6,7 +6,7 @@ window.onload = function() {
     let canvas_height = 600
     let canvas_width = 900
     let ctx
-    let delay  = 500
+    let delay = 100
     let score = 0
     let width_blocks = canvas_width/block_size
     let height_blocks = canvas_height/block_size
@@ -19,7 +19,7 @@ window.onload = function() {
         canvas.height = canvas_height
         canvas.style.border = "30px solid black"
         canvas.style.border = "50px auto"
-        canvas.style.backgroundColor = "#ddd"
+        canvas.style.backgroundColor = "#DDDDDD"
         canvas.style.display = "block"
         canvas.style.margin = "auto"
         document.body.appendChild(canvas)
@@ -38,7 +38,7 @@ window.onload = function() {
                 apple.setNewPosition()
             } while(apple.isOnSnake(snake))
         }
-        ctx.clearRect(0,0,canvasWidth,canvasHeight)
+        ctx.clearRect(0,0,canvas_width,canvas_height)
         ctx.fillStyle = "red"
         snake.checkCollision()
         snake.advance()
@@ -52,42 +52,44 @@ window.onload = function() {
         }
     }
 
-    function Snake(body) {
-        this.body = body
-        // this.direction = direction
-        this.draw = function(){
-           ctx.save()
-           ctx.fillstyle = "green"
-           for(let i=0; i < this.body.length; i++){
-            draw_block(ctx, this.body[i])
-           }
-           ctx.restore()
+    function Snake(body, direction) {
+        this.body = body;
+        this.direction = direction
+        this.eatApple = false
+
+        this.draw = function() {
+            ctx.save();
+            ctx.fillStyle = "green";
+            for (let i = 0; i < this.body.length; i++) {
+                draw_block(ctx, this.body[i]);
+            }
+            ctx.restore();
         }
-        this.advance = function(direction){
-            let nextPosition = this.body[0].slice()
-            switch  (this.direction) {
+        this.advance = function() {
+            let nextPosition = this.body[0].slice();
+            switch (this.direction) {
                 case "left":
-                    nextPosition[0] --
+                    nextPosition[0]--;
                     break;
                 case "right":
-                    nextPosition[0] ++
+                    nextPosition[0]++;
                     break;
                 case "down":
-                    nextPosition[1] ++
+                    nextPosition[1]++;
                     break;
                 case "up":
-                    nextPosition[1] --
+                    nextPosition[1]--;
                     break;
                 default:
                     break;
             }
-            this.body.unshift(nextPosition)
-            if(!this.eatApple){
-                this.body.pop()
-            }else{
-                this.eatApple = false
+            this.body.unshift(nextPosition);
+            if (!this.eatApple) {
+                this.body.pop();
+            } else {
+                this.eatApple = false;
             }
-        }
+        }        
         this.setDirection = function(newDirection){
             let allowedDirections
             switch (this.direction) {
@@ -109,20 +111,20 @@ window.onload = function() {
         this.checkCollision = function(){
             let collision = false
             let head = this.body[0]
-            let rest = this.body.slice(1)
+            let corps = this.body.slice(1)
             let snakeX = head[0]
             let snakeY = head[1]
             let minX = 0
             let minY = 0
             let maxX = width_blocks - 1
             let maxY = height_blocks - 1
-            if (snakeX < minX || snakeY < minY || snakeX > maxX || snakeY > maxY){
+            if (snakeX > maxX || snakeY > maxY || snakeX < minX || snakeY < minY){
                 defeat = true
-                textGameOver = "Le serpent s'est manger un mur ! "
+                text_game_over = "Le serpent s'est manger un mur ! "
             }
-            for (let i = 0; i < rest.length; i++){
-                if(snakeX === rest[i][0] && snakeY === rest[i][1]){
-                    textGameOver = "Le serpent s'est manger lui même ! "
+            for (let i = 0; i < corps.length; i++){
+                if(snakeX === corps[i][0] && snakeY === corps[i][1]){
+                    text_game_over = "Le serpent s'est manger lui même ! "
                     defeat = true
                 }
             }
@@ -144,9 +146,9 @@ window.onload = function() {
             ctx.save()
             ctx.fillStyle = "red"
             ctx.beginPath()
-            let radius = blockSize/2
-            let x = this.position[0]*blockSize + radius
-            let y = this.position[1]*blockSize + radius
+            let radius = block_size/2
+            let x = this.position[0]*block_size + radius
+            let y = this.position[1]*block_size + radius
             ctx.arc(x,y, radius, 0, Math.PI*2, true)
             ctx.fill()
             ctx.restore()
@@ -169,27 +171,33 @@ window.onload = function() {
     }
 
     function game_over() {
-        defeat = true
-        clearTimeout(refreshCanvas, delay)
+        defeat = true;
+        clearTimeout();
+        alert("Game Over! Score: " + score);
+        restart();
     }
 
     function restart() {
-        init()
+        defeat = false;
+        snake = new Snake([[6, 4], [5, 4], [4, 4]], "right");
+        score = 0;
+        apple = new Apple([10, 10]);
+        refreshCanvas();
     }
 
     /******************************************** DRAW *****************************************/
 
     function draw_score() {
         ctx.save()
-        ctx.font = "bold 200px sans-serif"
-        ctx.fillStyle = "gray"
-        ctx.textAlign = "center"
-        ctx.textBaseline = "middle"
-        let centerX = canvas_width / 2
-        let centerY = canvas_height / 2
-        ctx.fillText(score.toString(), centerX, centerY)
-        ctx.restore()
+        ctx.font = "bold 20px sans-serif"; 
+        ctx.fillStyle = "black";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "top";
+        let scoreText = "Score: " + score.toString();
+        ctx.fillText(scoreText, 10, 10); 
+        ctx.restore();
     }
+    
 
     function draw_block(ctx, position){
         let x = position[0] * block_size
